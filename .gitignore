@@ -1,0 +1,15 @@
+# never publish credentials or account state
+secret/
+*.pem
+*.p12
+*.key
+config.local.json
+# build and scratch
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+dist/
+*.log
+work/
+scratch/
