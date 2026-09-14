@@ -1,17 +1,22 @@
-Comment,Designator,Footprint,LCSC Part #
-10uF,C1,C_0805_2012Metric,C15850
-1uF,C2,C_0805_2012Metric,C28323
-10nF,C3,C_0805_2012Metric,C1710
-100nF,"C4, C5",C_0805_2012Metric,C49678
-Green (PWR),D1,LED_0805_2012Metric,C2297
-Yellow (PULSE),D2,LED_0805_2012Metric,C2296
-Blue (STATUS),D3,LED_0805_2012Metric,C2293
-USB-C,J1,USB_C_Receptacle_HRO_TYPE-C-31-M-12,C165948
-AVR-ISP,J2,PinHeader_2x03_P2.54mm_Vertical,C225434
-AUX_OUT,J3,PinHeader_1x04_P2.54mm_Vertical,C2243
-5.1k,"R1, R2",R_0805_2012Metric,C17637
-1k,"R3, R4, R8",R_0805_2012Metric,C17513
-10k,"R5, R7",R_0805_2012Metric,C17414
-47k,R6,R_0805_2012Metric,C17713
-NE555D,U1,SOIC-8_3.9x4.9mm_P1.27mm,C46749
-ATtiny85-20SU,U2,SOIC-8_3.9x4.9mm_P1.27mm,C44533
+"Refs","Value","Footprint","Qty","DNP"
+"C1","10uF","Capacitor_SMD:C_0805_2012Metric","1",""
+"C2","1uF","Capacitor_SMD:C_0805_2012Metric","1",""
+"C3","10nF","Capacitor_SMD:C_0805_2012Metric","1",""
+"C4","100nF","Capacitor_SMD:C_0805_2012Metric","1",""
+"C5","100nF","Capacitor_SMD:C_0805_2012Metric","1",""
+"D1","Green (PWR)","LED_SMD:LED_0805_2012Metric","1",""
+"D2","Yellow (PULSE)","LED_SMD:LED_0805_2012Metric","1",""
+"D3","Blue (STATUS)","LED_SMD:LED_0805_2012Metric","1",""
+"J1","USB-C","Connector_USB:USB_C_Receptacle_HRO_TYPE-C-31-M-12","1",""
+"J2","AVR-ISP","Connector_PinHeader_2.54mm:PinHeader_2x03_P2.54mm_Vertical","1",""
+"J3","AUX_OUT","Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical","1",""
+"R1","5.1k","Resistor_SMD:R_0805_2012Metric","1",""
+"R2","5.1k","Resistor_SMD:R_0805_2012Metric","1",""
+"R3","1k","Resistor_SMD:R_0805_2012Metric","1",""
+"R4","1k","Resistor_SMD:R_0805_2012Metric","1",""
+"R5","10k","Resistor_SMD:R_0805_2012Metric","1",""
+"R6","47k","Resistor_SMD:R_0805_2012Metric","1",""
+"R7","10k","Resistor_SMD:R_0805_2012Metric","1",""
+"R8","1k","Resistor_SMD:R_0805_2012Metric","1",""
+"U1","NE555D","Package_SO:SOIC-8_3.9x4.9mm_P1.27mm","1",""
+"U2","ATtiny85-20SU","Package_SO:SOIC-8_3.9x4.9mm_P1.27mm","1",""

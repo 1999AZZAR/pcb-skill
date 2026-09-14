@@ -16,8 +16,8 @@ Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
 "C_TREB_R1","2.2nF","C_Disc_D3.8mm_W2.6mm_P2.50mm",52.000000,-21.000000,0.000000,top
 "C_TREB_R2","2.2nF","C_Disc_D3.8mm_W2.6mm_P2.50mm",52.000000,-24.500000,0.000000,top
 "D1","PWR_LED","LED_D3.0mm",36.000000,-54.000000,0.000000,top
-"J1","AUDIO_IN","Jack_3.5mm_Ledino_KB3SPRS_Horizontal",14.000000,-50.000000,-90.000000,top
-"J2","AUDIO_OUT","Jack_3.5mm_Ledino_KB3SPRS_Horizontal",68.000000,-50.000000,-90.000000,top
+"J1","AUDIO_IN","Jack_3.5mm_Ledino_KB3SPRS_Horizontal",20.000000,-50.000000,90.000000,top
+"J2","AUDIO_OUT","Jack_3.5mm_Ledino_KB3SPRS_Horizontal",74.000000,-50.000000,90.000000,top
 "J3","BAT_3V3","PinHeader_1x02_P2.54mm_Vertical",44.000000,-54.000000,0.000000,top
 "RV1","VOL","Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles",14.000000,-12.500000,90.000000,top
 "RV2","BASS","Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles",28.000000,-12.500000,90.000000,top

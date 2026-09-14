@@ -1,25 +1,52 @@
-Comment,Designator,Footprint,LCSC Part #
-47nF,C_BASS_L1 C_BASS_R1,C_Disc_D3.8mm_W2.6mm_P2.50mm,
-47uF,C_BIAS1,CP_Radial_D5.0mm_P2.00mm,
-100nF,C_BIAS2 C_PWR2,C_Disc_D3.8mm_W2.6mm_P2.50mm,
-1uF,C_IN_L C_IN_R,C_Disc_D3.8mm_W2.6mm_P2.50mm,
-22nF,C_MID_L1 C_MID_R1,C_Disc_D3.8mm_W2.6mm_P2.50mm,
-100uF,C_OUT_L C_OUT_R C_PWR1,CP_Radial_D5.0mm_P2.00mm,
-2.2nF,C_TREB_L1 C_TREB_L2 C_TREB_R1 C_TREB_R2,C_Disc_D3.8mm_W2.6mm_P2.50mm,
-PWR_LED,D1,LED_D3.0mm,
-AUDIO_IN,J1,Jack_3.5mm_Ledino_KB3SPRS_Horizontal,
-AUDIO_OUT,J2,Jack_3.5mm_Ledino_KB3SPRS_Horizontal,
-BAT_3V3,J3,PinHeader_1x02_P2.54mm_Vertical,
-VOL,RV1,Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles,
-BASS,RV2,Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles,
-MID,RV3,Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles,
-TREBLE,RV4,Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles,
-BAL,RV5,Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles,
-4.7k,R_BASS_L R_BASS_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-47k,R_BIAS1 R_BIAS2 R_FB_EQ_L R_FB_EQ_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-10k,R_FB_L R_FB_R R_GND_L R_GND_R R_IN_EQ_L R_IN_EQ_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-100k,R_IN_L R_IN_R R_PULL_L R_PULL_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-1k,R_PWR,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-47R,R_STAB_L R_STAB_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-2.2k,R_TREB_L R_TREB_R,R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal,
-MCP6004,U1,DIP-14_W7.62mm,
+"Refs","Value","Footprint","Qty","DNP"
+"C_BASS_L1","47nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_BASS_R1","47nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_BIAS1","47uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm","1",""
+"C_BIAS2","100nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_IN_L?","1uF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_IN_R?","1uF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_MID_L1","22nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_MID_R1","22nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_OUT_L?","100uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm","1",""
+"C_OUT_R?","100uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm","1",""
+"C_PWR1","100uF","Capacitor_THT:CP_Radial_D5.0mm_P2.00mm","1",""
+"C_PWR2","100nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_TREB_L1","2.2nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_TREB_L2","2.2nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_TREB_R1","2.2nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"C_TREB_R2","2.2nF","Capacitor_THT:C_Disc_D3.8mm_W2.6mm_P2.50mm","1",""
+"D1","PWR_LED","LED_THT:LED_D3.0mm","1",""
+"H1","M3","MountingHole:MountingHole_3.2mm_M3","1",""
+"H2","M3","MountingHole:MountingHole_3.2mm_M3","1",""
+"H3","M3","MountingHole:MountingHole_3.2mm_M3","1",""
+"H4","M3","MountingHole:MountingHole_3.2mm_M3","1",""
+"J1","AUDIO_IN","Connector_Audio:Jack_3.5mm_Ledino_KB3SPRS_Horizontal","1",""
+"J2","AUDIO_OUT","Connector_Audio:Jack_3.5mm_Ledino_KB3SPRS_Horizontal","1",""
+"J3","BAT_3V3","Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical","1",""
+"RV1","VOL","Potentiometer_THT:Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles","1",""
+"RV2","BASS","Potentiometer_THT:Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles","1",""
+"RV3","MID","Potentiometer_THT:Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles","1",""
+"RV4","TREBLE","Potentiometer_THT:Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles","1",""
+"RV5","BAL","Potentiometer_THT:Potentiometer_Alpha_RD902F-40-00D_Dual_Vertical_CircularHoles","1",""
+"R_BASS_L?","4.7k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_BASS_R?","4.7k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_BIAS1","47k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_BIAS2","47k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_FB_EQ_L?","47k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_FB_EQ_R?","47k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_FB_L?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_FB_R?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_GND_L?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_GND_R?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_IN_EQ_L?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_IN_EQ_R?","10k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_IN_L?","100k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_IN_R?","100k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_PULL_L?","100k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_PULL_R?","100k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_PWR?","1k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_STAB_L?","47R","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_STAB_R?","47R","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_TREB_L?","2.2k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"R_TREB_R?","2.2k","Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal","1",""
+"U1","MCP6004","Package_DIP:DIP-14_W7.62mm","1",""

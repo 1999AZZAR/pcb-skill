@@ -154,11 +154,16 @@ def _validate_with_pcbnew(board_path: str, min_edge_clearance_mm: float) -> Dict
         # Determine true courtyard bounding box
         x0, y0, x1, y1 = _get_courtyard_bbox(fp)
 
-        is_conn = (
+        # Only audit directional edge connectors (USB, audio jacks, barrel jacks, horizontal headers).
+        # Vertical pin headers plug in along Z (upwards) and do not have an outward edge face.
+        is_directional_conn = (
             any(fp_id.startswith(k) for k in CONNECTOR_0DEG_FACES) or
-            any(sub in fp_id for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "PinHeader", "SMA"]) or
-            ref.startswith("J")
-        )
+            any(sub in fp_id for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "SMA", "HDMI", "RJ45"]) or
+            ("Horizontal" in fp_id and ("PinHeader" in fp_id or ref.startswith("J"))) or
+            ("RightAngle" in fp_id and ("PinHeader" in fp_id or ref.startswith("J")))
+        ) and "Vertical" not in fp_id
+
+        is_conn = is_directional_conn or ref.startswith("J") or "PinHeader" in fp_id
 
         fp_info = {
             "ref": ref,
@@ -172,7 +177,7 @@ def _validate_with_pcbnew(board_path: str, min_edge_clearance_mm: float) -> Dict
         fp_data.append(fp_info)
 
         # 1. CONNECTOR ORIENTATION AUDIT
-        if is_conn:
+        if is_directional_conn:
             # Determine closest board edge
             dist_w = px - bx_min
             dist_e = bx_max - px
@@ -312,9 +317,10 @@ def _validate_with_sexpr(board_path: str, min_edge_clearance_mm: float) -> Dict[
 
         is_conn = (
             any(fpid.startswith(k) for k in CONNECTOR_0DEG_FACES) or
-            any(sub in fpid for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "SMA"]) or
-            ref.startswith("J")
-        )
+            any(sub in fpid for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "SMA", "HDMI", "RJ45"]) or
+            ("Horizontal" in fpid and ("PinHeader" in fpid or ref.startswith("J"))) or
+            ("RightAngle" in fpid and ("PinHeader" in fpid or ref.startswith("J")))
+        ) and "Vertical" not in fpid
 
         if is_conn:
             dist_w = px - bx_min

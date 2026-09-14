@@ -13,3 +13,6 @@ dist/
 *.log
 work/
 scratch/
+*-backups/
+fp-info-cache
+*.rpt
