@@ -86,10 +86,32 @@ def format_summary(res):
     lines.append("  Warnings         : %d" % res["warnings_count"])
     lines.append("  Unconnected Nets : %d" % res["unconnected_count"])
     lines.append("  Schematic Parity : %d" % res["parity_issues_count"])
+
+    pv = res.get("placement_preflight")
+    if pv:
+        lines.append("  Connector Errors : %d" % len(pv.get("connector_errors", [])))
+        lines.append("  Courtyard Overlaps: %d" % len(pv.get("courtyard_overlaps", [])))
+        lines.append("  Edge Violations   : %d" % len(pv.get("edge_clearance_errors", [])))
+
     if res["categories"]:
         lines.append("  Categories       :")
         for cat, cnt in sorted(res["categories"].items()):
             lines.append("    - %-24s: %d" % (cat, cnt))
+
+    if pv and pv.get("connector_errors"):
+        lines.append("\n⚠️ MISORIENTED CONNECTORS (Mating face reversed/inward):")
+        for idx, e in enumerate(pv["connector_errors"], 1):
+            lines.append("  %d. [%s] %s" % (idx, e.get("ref"), e.get("message")))
+
+    if pv and pv.get("courtyard_overlaps"):
+        lines.append("\n⚠️ COURTYARD COLLISIONS (Physical component overlap):")
+        for idx, c in enumerate(pv["courtyard_overlaps"][:10], 1):
+            lines.append("  %d. %s" % (idx, c.get("message")))
+
+    if pv and pv.get("edge_clearance_errors"):
+        lines.append("\n⚠️ BOARD EDGE CLEARANCE (< 0.5mm from board cut):")
+        for idx, cl in enumerate(pv["edge_clearance_errors"][:10], 1):
+            lines.append("  %d. %s" % (idx, cl.get("message")))
 
     if res["errors"]:
         lines.append("\nERRORS (must fix):")
@@ -144,9 +166,23 @@ def main(argv):
     strict = "--strict" in argv
     check_parity = "--no-schematic-parity" not in argv
     res = run_drc(pcb_path, output_json=out_json, schematic_parity=check_parity)
+
+    if "--no-preflight" not in argv:
+        try:
+            core_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "core")
+            if core_dir not in sys.path:
+                sys.path.insert(0, core_dir)
+            from placement_validator import validate_placement
+            pv_res = validate_placement(pcb_path)
+            res["placement_preflight"] = pv_res
+            if not pv_res["clean"]:
+                res["clean"] = False
+        except Exception:
+            pass
+
     print(format_summary(res))
 
-    if strict and (res["errors_count"] > 0 or res["unconnected_count"] > 0):
+    if strict and (res["errors_count"] > 0 or res["unconnected_count"] > 0 or not res.get("clean", True)):
         return 1
     return 0
 

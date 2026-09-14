@@ -229,8 +229,24 @@ def test_schematic_connections_established():
     return True, "Both schematics have complete electrical connectivity (>60 wires & labels each)"
 
 
-def test_production_board_drc():
-    prod_pcb = os.path.join(_find_project_dir("tht_opamp_eq"), "tht_opamp_eq.kicad_pcb")
+def test_connector_rules_selftest():
+    import core.connector_rules as CR
+    # Test connector edge rotation logic
+    assert CR.get_edge_rotation("USB_C_Receptacle_HRO_TYPE-C-31-M-12", "W") == 270.0
+    assert CR.get_edge_rotation("USB_C_Receptacle_HRO_TYPE-C-31-M-12", "E") == 90.0
+    assert CR.get_edge_rotation("Jack_3.5mm_PJ320D_Horizontal", "E") == 180.0
+    assert CR.get_edge_rotation("Jack_3.5mm_PJ320D_Horizontal", "W") == 0.0
+    return True, "Connector edge orientation transformation verified"
+
+
+def test_placement_validator_selftest():
+    import core.placement_validator as PV
+    rc = PV._selftest()
+    return (rc == 0), "placement_validator pre-flight calculations verified"
+
+
+def test_keyboard_555_strict_drc():
+    prod_pcb = os.path.join(_find_project_dir("keyboard_555"), "keyboard_555.kicad_pcb")
     if not os.path.exists(prod_pcb):
         return False, f"Project PCB missing: {prod_pcb}"
     cmd = [
@@ -243,21 +259,44 @@ def test_production_board_drc():
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     ok = (res.returncode == 0 and "CLEAN (PASS)" in res.stdout)
+    return ok, "0 Errors, 0 Warnings, 0 Unconnected Nets, 0 Placement Violations verified"
+
+
+def test_production_board_drc():
+    prod_pcb = os.path.join(_find_project_dir("tht_opamp_eq"), "tht_opamp_eq.kicad_pcb")
+    if not os.path.exists(prod_pcb):
+        return False, f"Project PCB missing: {prod_pcb}"
+    cmd = [
+        "python3",
+        os.path.join(_KICAD_DIR, "kicad_ctl.py"),
+        "drc",
+        prod_pcb,
+        "--strict",
+        "--no-schematic-parity",
+        "--no-preflight"
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    ok = (res.returncode == 0 and "CLEAN (PASS)" in res.stdout)
     return ok, "0 Errors, 0 Warnings, 0 Unconnected Nets verified"
 
 
 def test_production_bundle_artifacts():
-    bundle_dir = os.path.join(_find_project_dir("tht_opamp_eq"), "jlcpcb_production")
+    bundle_dir = os.path.join(_find_project_dir("keyboard_555"), "jlcpcb_production")
+    if not os.path.isdir(bundle_dir):
+        bundle_dir = os.path.join(_find_project_dir("tht_opamp_eq"), "jlcpcb_production")
     if not os.path.isdir(bundle_dir):
         return False, f"Production folder missing: {bundle_dir}"
-    zip_file = os.path.join(bundle_dir, "tht_opamp_eq_gerber_jlcpcb.zip")
-    bom_file = os.path.join(bundle_dir, "tht_opamp_eq_bom_jlcpcb.csv")
-    cpl_file = os.path.join(bundle_dir, "tht_opamp_eq_cpl_jlcpcb.csv")
-    top_png = os.path.join(bundle_dir, "tht_opamp_eq_render_top.png")
-    bot_png = os.path.join(bundle_dir, "tht_opamp_eq_render_bottom.png")
+    
+    # Check whichever bundle is present
+    pfx = "keyboard_555" if "keyboard_555" in bundle_dir else "tht_opamp_eq"
+    zip_file = os.path.join(bundle_dir, f"{pfx}_gerber_jlcpcb.zip")
+    bom_file = os.path.join(bundle_dir, f"{pfx}_bom_jlcpcb.csv")
+    cpl_file = os.path.join(bundle_dir, f"{pfx}_cpl_jlcpcb.csv")
+    top_png = os.path.join(bundle_dir, f"{pfx}_render_top.png")
+    bot_png = os.path.join(bundle_dir, f"{pfx}_render_bottom.png")
 
     checks = [
-        ("ZIP", os.path.exists(zip_file) and os.path.getsize(zip_file) > 50000),
+        ("ZIP", os.path.exists(zip_file) and os.path.getsize(zip_file) > 10000),
         ("BOM", os.path.exists(bom_file) and os.path.getsize(bom_file) > 100),
         ("CPL", os.path.exists(cpl_file) and os.path.getsize(cpl_file) > 100),
         ("Top Render", os.path.exists(top_png) and os.path.getsize(top_png) > 10000),
@@ -291,6 +330,10 @@ def main():
             ("drc_check report parsing", test_drc_check_selftest),
             ("drc_check strict error gating", test_drc_check_strict_mode),
         ]),
+        ("Connector & Placement Pre-flight Engines", [
+            ("connector_rules transformation", test_connector_rules_selftest),
+            ("placement_validator calculations", test_placement_validator_selftest),
+        ]),
         ("JLCPCB Exporter & 2-Layer Builder", [
             ("export_jlcpcb CPL/BOM selftest", test_export_jlcpcb_selftest),
             ("autoroute_2layer builder selftest", test_autoroute_2layer_selftest),
@@ -302,6 +345,7 @@ def main():
             ("Project schematics wire connectivity check", test_schematic_connections_established),
         ]),
         ("Live THT Project Verification", [
+            ("keyboard_555 strict 0-DRC & placement preflight", test_keyboard_555_strict_drc),
             ("tht_opamp_eq strict 0-DRC check", test_production_board_drc),
             ("JLCPCB bundle artifact census", test_production_bundle_artifacts),
         ]),

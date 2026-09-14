@@ -19,6 +19,7 @@ USAGE
   python3 kicad_ctl.py run <command> --file params.json
   python3 kicad_ctl.py embed-symbols SCHEMATIC.kicad_sch
   python3 kicad_ctl.py wire-schematic SCHEMATIC.kicad_sch [--board BOARD.kicad_pcb] [--stub-length MM]
+  python3 kicad_ctl.py audit-placement BOARD.kicad_pcb [--strict] [--json out.json]
   python3 kicad_ctl.py export-jlcpcb BOARD.kicad_pcb [--schematic SCH.kicad_sch] [--out-dir DIR]
   python3 kicad_ctl.py drc BOARD.kicad_pcb [--strict] [--no-schematic-parity]
   python3 kicad_ctl.py refill-zones BOARD.kicad_pcb
@@ -338,6 +339,13 @@ def main(argv):
         import autoroute_2layer as A2
         ok = A2.fill_zones_safely(argv[2], verbose=True)
         return 0 if ok else 1
+
+    elif action in ("audit-placement", "validate-placement"):
+        if len(argv) < 3:
+            print("Usage: python3 kicad_ctl.py audit-placement BOARD.kicad_pcb [--strict] [--json out.json]")
+            return 2
+        import placement_validator as PV
+        return PV.main([PV.__file__] + argv[2:])
 
     elif action == "render-3d":
         if len(argv) < 3:

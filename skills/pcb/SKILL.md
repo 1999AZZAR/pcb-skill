@@ -78,8 +78,15 @@ These are load-bearing. `references/02-review.md` explains each with the failure
   for solid connection.
 - **Rotated pad geometry is anisotropic:** Pads at 90° swap width and height in global board space.
   Evaluate rotated coordinates plus solder mask expansion ($0.05\,\text{mm}$) when checking trace clearance.
-- **SWIG track iterator invalidation:** Never call `board.Remove()` inside a `board.GetTracks()`
-  loop. Snapshot into a Python `list()` first.
+- **Connector Mating Orientation Traps (`connector_rules.py`):** KiCad footprints do NOT share
+  a uniform 0-degree mating angle: USB-C points South (+Y) at 0°, while Audio Jacks point West (-X)
+  at 0°. Rotating by intuition causes connectors to face backwards into the board. Always compute
+  exact edge orientations with `scripts/kicad/core/connector_rules.py` (USB-C West=270°, East=90°;
+  Audio Jack East=180°, West=0°).
+- **Pre-flight Placement & Clearance Engine (`placement_validator.py`):** Never guess placement
+  coordinates or iterate blindly through DRC errors. Run `kicad_ctl.py audit-placement` before routing
+  to mathematically audit true courtyard overlaps (`F.CrtYd`), connector edge alignments, and $\ge 0.5\,\text{mm}$
+  board-edge clearances in $<100\,\text{ms}$.
 - **The last honest step is the user's.** Logins, CAPTCHAs, and payment are theirs. Prepare
   everything else so their part is two minutes.
 
@@ -91,7 +98,7 @@ These are load-bearing. `references/02-review.md` explains each with the failure
 | `references/02-review.md` | before every review, and when writing any checker |
 | `references/03-jlc-manufacturing.md` | before fixing the board outline, stack-up or rules |
 | `references/04-sourcing.md` | choosing parts, pricing, netting against stock, staging carts |
-| `references/05-kicad-workflow.md` | driving KiCad headlessly via CLI, pcbnew, and DSN/SES |
+| `references/05-kicad-workflow.md` | driving KiCad headlessly via CLI, pcbnew, connector rules, and DSN/SES |
 | `references/06-mechanical.md` | before declaring a board assemblable; 3D, connectors, folds |
 | `references/07-bringup.md` | flashing and first power-up, especially with no USB-serial adapter |
 
@@ -101,7 +108,7 @@ These are load-bearing. `references/02-review.md` explains each with the failure
 of the EDA: they parse exported documents and Gerbers, so they can contradict the tool that
 produced them. Each directory has its own README.
 
-- `scripts/kicad/` — unified 233-command controller (`kicad_ctl.py`), post-routing cleanup engine (`cleanup_board.py`), test suite (`run_all_tests.py`), deterministic 2-layer layout & routing engine (`autoroute_2layer.py`), 1-command JLCPCB fabrication & 3D render exporter (`export_jlcpcb.py`), headless DRC checker (`drc_check.py`), and autorouter runner (`route_kicad.py`)
+- `scripts/kicad/` — unified 233-command controller (`kicad_ctl.py`), connector orientation engine (`connector_rules.py`), pre-flight placement validator (`placement_validator.py`), post-routing cleanup engine (`cleanup_board.py`), test suite (`run_all_tests.py`), deterministic 2-layer layout & routing engine (`autoroute_2layer.py`), 1-command JLCPCB fabrication & 3D render exporter (`export_jlcpcb.py`), headless DRC checker with integrated pre-flight audit (`drc_check.py`), and autorouter runner (`route_kicad.py`)
 - `scripts/placement/` — KiCad board importer (`import_kicad.py`), courtyards from real pads, via-lane widths, module-body clearance
 - `scripts/routing/` — the DSN/SES autoroute chain with KiCad SES merger (`ses_import.py --format kicad`), four-state watchdog, and rate floor
 - `scripts/verify/` — netlist assertions, Gerber parsing, drill census, 3D interference

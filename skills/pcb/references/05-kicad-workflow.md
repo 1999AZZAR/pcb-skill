@@ -242,6 +242,45 @@ When scripting `pcbnew` in Python:
    Running `kicad-cli pcb drc` on a standalone `.kicad_pcb` in `/tmp` uses KiCad default rules. Running it in the project directory with `.kicad_pro` present evaluates custom project rules (such as `starved_thermal` or netclass clearance overrides).
    Always run DRC in the project directory with the matching `.kicad_pro` present to catch project-level constraints early.
 
+10. **Connector Edge Alignment & Orientation Convention (`connector_rules.py`)**:
+    - KiCad footprint libraries do **NOT** share a uniform 0-degree mating orientation:
+      - `USB_C_Receptacle_*` and `USB_Micro_B_*`: Mating opening points **South (+Y)** at 0°.
+      - `Jack_3.5mm_*`, `BarrelJack_*`, and `SMA_*`: Mating opening points **West (-X)** at 0°.
+    - In KiCad's coordinate system (+Y down), EDA_ANGLE rotation applies:
+      $$rx = vx \cos\theta + vy \sin\theta$$
+      $$ry = -vx \sin\theta + vy \cos\theta$$
+    - **Authoritative Orientation Table**:
+      | Connector Type | Target Board Edge | Required KiCad Angle | Notes |
+      |---|---|---|---|
+      | **USB Type-C** (HRO, GCT, Amphenol) | West ($X=0$) | **270.0°** (or -90°) | Mouth flush with $X=0$, SMT pads face inward East ($+X$) |
+      | **USB Type-C** (HRO, GCT, Amphenol) | East ($X=W$) | **90.0°** | Mouth flush with $X=W$, SMT pads face inward West ($-X$) |
+      | **USB Type-C** (HRO, GCT, Amphenol) | South ($Y=H$) | **0.0°** | Mouth flush with $Y=H$, SMT pads face inward North ($-Y$) |
+      | **USB Type-C** (HRO, GCT, Amphenol) | North ($Y=0$) | **180.0°** | Mouth flush with $Y=0$, SMT pads face inward South ($+Y$) |
+      | **Audio Jack 3.5mm** (PJ320D, CUI) | East ($X=W$) | **180.0°** | Barrel flush with $X=W$, solder pins face inward West ($-X$) |
+      | **Audio Jack 3.5mm** (PJ320D, CUI) | West ($X=0$) | **0.0°** | Barrel flush with $X=0$, solder pins face inward East ($+X$) |
+      | **Audio Jack 3.5mm** (PJ320D, CUI) | South ($Y=H$) | **90.0°** | Barrel flush with $Y=H$, solder pins face inward North ($-Y$) |
+      | **Audio Jack 3.5mm** (PJ320D, CUI) | North ($Y=0$) | **270.0°** | Barrel flush with $Y=0$, solder pins face inward South ($+Y$) |
+      | **DC Barrel Jack** (PJ-002AH) | West ($X=0$) | **0.0°** | Receptacle flush with $X=0$, pins face inward East ($+X$) |
+      | **DC Barrel Jack** (PJ-002AH) | East ($X=W$) | **180.0°** | Receptacle flush with $X=W$, pins face inward West ($-X$) |
+
+    - **MANDATORY**: Never guess connector rotation or rely on visual luck. Always run:
+      ```bash
+      python3 scripts/kicad/core/connector_rules.py project.kicad_pcb
+      ```
+
+11. **Pre-flight Placement & Clearance Calculation Protocol (`placement_validator.py`)**:
+    - **Never guess placement coordinates or iterate blindly through DRC errors.**
+    - Run the pre-flight placement engine before routing:
+      ```bash
+      python3 scripts/kicad/kicad_ctl.py audit-placement project.kicad_pcb [--strict]
+      ```
+    - Computes in $<100\,\text{ms}$:
+      1. Connector outward edge orientation & flush edge alignment.
+      2. True IPC courtyard collision detection (`F.CrtYd` & `B.CrtYd`).
+      3. Minimum board edge clearance ($\ge 0.5\,\text{mm}$ for all non-edge components).
+      4. Drilled hole collision detection across distinct components.
+    - Integrated directly into `scripts/kicad/drc_check.py` so any misoriented connector or physical component overlap is flagged immediately at Stage 1.
+
 ---
 
 ## 6. End-to-End Headless Verification Pipeline

@@ -20,6 +20,16 @@ Drives **KiCad 9** natively via headless command-line interfaces (`kicad-cli`), 
   * 233 programmatic automation commands spanning schematics, footprints, routing, placement, netlists, and DRC checks.
   * Headless execution without requiring GUI interaction or display servers.
 
+* **Connector Edge Orientation Engine ([`connector_rules.py`](scripts/kicad/core/connector_rules.py))**:
+  * Eliminates backwards / reversed connector placement bugs.
+  * Resolves KiCad library coordinate disparities where default 0° mating faces vary (USB Type-C points South $+Y$, 3.5mm Audio Jacks point West $-X$).
+  * Enforces exact outward edge rotation angles across any board edge ($W=270^\circ$, $E=90^\circ$ for USB-C; $E=180^\circ$, $W=0^\circ$ for Audio Jacks).
+
+* **Pre-Flight Placement & Clearance Validator ([`placement_validator.py`](scripts/kicad/core/placement_validator.py))**:
+  * Replaces slow, iterative DRC trial-and-error with $<100\,\text{ms}$ mathematical pre-flight validation.
+  * Audits true IPC courtyard polygon collisions (`F.CrtYd` / `B.CrtYd`), connector edge alignments, and $\ge 0.5\,\text{mm}$ board-edge clearances.
+  * Seamlessly integrated into `scripts/kicad/drc_check.py` and `kicad_ctl.py audit-placement`.
+
 * **Deterministic 2-Layer Router ([`autoroute_2layer.py`](scripts/kicad/autoroute_2layer.py))**:
   * Programmatic 2-layer layout builder enforcing the **5 Golden Rules**:
     1. Solid unbroken bottom ground plane (`B.Cu`).
