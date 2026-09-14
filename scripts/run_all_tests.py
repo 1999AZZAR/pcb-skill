@@ -187,6 +187,14 @@ def test_embed_symbols_selftest():
     return (rc == 0), "embed_symbols canonical mapping & extraction verified"
 
 
+def _find_project_dir(name):
+    for base in ("/home/azzar/project/pcb", "/home/azzar/project"):
+        cand = os.path.join(base, name)
+        if os.path.isdir(cand):
+            return cand
+    return os.path.join("/home/azzar/project/pcb", name)
+
+
 def test_wire_schematic_selftest():
     import wire_schematic
     rc = wire_schematic._selftest()
@@ -194,8 +202,8 @@ def test_wire_schematic_selftest():
 
 
 def test_schematic_symbols_embedded():
-    sch1 = "/home/azzar/project/tht_opamp_eq/tht_opamp_eq.kicad_sch"
-    sch2 = "/home/azzar/project/pcb_trial/attiny85_timer.kicad_sch"
+    sch1 = os.path.join(_find_project_dir("tht_opamp_eq"), "tht_opamp_eq.kicad_sch")
+    sch2 = os.path.join(_find_project_dir("attiny85_timer"), "attiny85_timer.kicad_sch")
     for s in (sch1, sch2):
         if not os.path.exists(s):
             return False, f"Schematic missing: {s}"
@@ -207,8 +215,8 @@ def test_schematic_symbols_embedded():
 
 
 def test_schematic_connections_established():
-    sch1 = "/home/azzar/project/tht_opamp_eq/tht_opamp_eq.kicad_sch"
-    sch2 = "/home/azzar/project/pcb_trial/attiny85_timer.kicad_sch"
+    sch1 = os.path.join(_find_project_dir("tht_opamp_eq"), "tht_opamp_eq.kicad_sch")
+    sch2 = os.path.join(_find_project_dir("attiny85_timer"), "attiny85_timer.kicad_sch")
     for s in (sch1, sch2):
         if not os.path.exists(s):
             return False, f"Schematic missing: {s}"
@@ -222,7 +230,7 @@ def test_schematic_connections_established():
 
 
 def test_production_board_drc():
-    prod_pcb = "/home/azzar/project/tht_opamp_eq/tht_opamp_eq.kicad_pcb"
+    prod_pcb = os.path.join(_find_project_dir("tht_opamp_eq"), "tht_opamp_eq.kicad_pcb")
     if not os.path.exists(prod_pcb):
         return False, f"Project PCB missing: {prod_pcb}"
     cmd = [
@@ -239,7 +247,7 @@ def test_production_board_drc():
 
 
 def test_production_bundle_artifacts():
-    bundle_dir = "/home/azzar/project/tht_opamp_eq/jlcpcb_production"
+    bundle_dir = os.path.join(_find_project_dir("tht_opamp_eq"), "jlcpcb_production")
     if not os.path.isdir(bundle_dir):
         return False, f"Production folder missing: {bundle_dir}"
     zip_file = os.path.join(bundle_dir, "tht_opamp_eq_gerber_jlcpcb.zip")
