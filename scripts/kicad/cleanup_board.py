@@ -304,8 +304,8 @@ def fix_starved_thermals(board, verbose=False):
     return fixed
 
 
-def clean_temporary_files(directory, extensions=(".dsn", ".ses", ".raw", ".gbrjob", ".kicad_pcb-bak", ".kicad_sch-bak"), verbose=False):
-    """Remove temporary autorouting files and scratch logs from project directory."""
+def clean_temporary_files(directory, extensions=(".dsn", ".ses", ".raw", ".gbrjob", ".kicad_pcb-bak", ".kicad_sch-bak", ".orig"), purge_scaffolding=False, verbose=False):
+    """Remove temporary autorouting files, trial boards, and scratch logs from project directory."""
     removed = 0
     for ext in extensions:
         pattern = os.path.join(directory, "*" + ext)
@@ -315,12 +315,26 @@ def clean_temporary_files(directory, extensions=(".dsn", ".ses", ".raw", ".gbrjo
                 removed += 1
             except OSError:
                 pass
+
+    # Clean intermediate test boards and debug dumps
+    patterns = ["test_*", "drc_*.json", "*missing3Dmodels.txt", "*_temp.json"]
+    if purge_scaffolding:
+        patterns.extend(["gen_*.py", "assert_*.py", "*.net", "MISSION.md", "DECISIONS.md", "PROGRESS.md"])
+
+    for pat in patterns:
+        for f in glob.glob(os.path.join(directory, pat)):
+            try:
+                os.remove(f)
+                removed += 1
+            except OSError:
+                pass
+
     if verbose and removed:
-        print("  Removed %d temporary autorouting artifact(s) from %s" % (removed, directory))
+        print("  Removed %d temporary/scaffolding artifact(s) from %s" % (removed, directory))
     return removed
 
 
-def cleanup_board(pcb_path, out_pcb_path=None, clean_temp=True, refill=True, verbose=True):
+def cleanup_board(pcb_path, out_pcb_path=None, clean_temp=True, purge_scaffolding=False, refill=True, verbose=True):
     """Execute complete post-routing cleanup on a KiCad PCB file."""
     if not _HAS_PCBNEW:
         raise RuntimeError("pcbnew required for board cleanup")
@@ -353,8 +367,8 @@ def cleanup_board(pcb_path, out_pcb_path=None, clean_temp=True, refill=True, ver
             if verbose:
                 print("  Zone refill note: %s" % e)
 
-    if clean_temp:
-        clean_temporary_files(os.path.dirname(os.path.abspath(pcb_path)), verbose=verbose)
+    if clean_temp or purge_scaffolding:
+        clean_temporary_files(os.path.dirname(os.path.abspath(pcb_path)), purge_scaffolding=purge_scaffolding, verbose=verbose)
 
     if verbose:
         print("Cleanup completed successfully -> %s" % out_path)
@@ -444,7 +458,8 @@ def main(argv):
     pcb = argv[1]
     out_pcb = argv[argv.index("-o") + 1] if "-o" in argv else pcb
     clean_temp = "--clean-temp" in argv or "-c" in argv
-    res = cleanup_board(pcb, out_pcb_path=out_pcb, clean_temp=clean_temp, verbose=True)
+    purge_scaffolding = "--purge-scaffolding" in argv or "--purge" in argv
+    res = cleanup_board(pcb, out_pcb_path=out_pcb, clean_temp=clean_temp, purge_scaffolding=purge_scaffolding, verbose=True)
     return 0 if res.get("success") else 1
 
 

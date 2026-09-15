@@ -87,6 +87,21 @@ These are load-bearing. `references/02-review.md` explains each with the failure
   coordinates or iterate blindly through DRC errors. Run `kicad_ctl.py audit-placement` before routing
   to mathematically audit true courtyard overlaps (`F.CrtYd`), connector edge alignments, and $\ge 0.5\,\text{mm}$
   board-edge clearances in $<100\,\text{ms}$.
+- **Standardized Deliverable File Structure & Clean-up (Zero Bloat):**
+  Every PCB design project MUST conclude with a cleanup pass to ensure a uniform deliverable directory across all projects (e.g. `keyboard_555`, `esp32c3_controller`, `stereo_mixer_4ch`).
+  1. Remove all intermediate generator scripts (`gen_*.py`, `assert_netlist.py`), test boards (`test_*`), raw netlists (`*.net`), and debug dumps (`*.json`, `*.log`, `*missing3Dmodels.txt`).
+  2. Synthesize all mission constraints, circuit calculations, architecture decisions, BOM, and verification stats into a single comprehensive `README.md` with 3D render previews (`jlcpcb_production/*_render_top.png` and `*_render_bottom.png`).
+  3. Export standard `<project>-drc.rpt` and `<project>-erc.rpt`.
+  4. The root directory must strictly contain ONLY:
+     - `jlcpcb_production/` (Gerber zip, BOM, CPL, 3D renders)
+     - `<project>-drc.rpt`
+     - `<project>-erc.rpt`
+     - `<project>.kicad_pcb`
+     - `<project>.kicad_sch`
+     - `<project>.kicad_pro`
+     - `<project>.kicad_prl`
+     - `README.md`
+     - `fp-info-cache`
 - **The last honest step is the user's.** Logins, CAPTCHAs, and payment are theirs. Prepare
   everything else so their part is two minutes.
 

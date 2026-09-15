@@ -52,6 +52,10 @@ CONNECTOR_0DEG_FACES = {
     "Jack_3.5mm_Cui_SJ1-3533NG_Horizontal": (-1, 0),     # 0 deg faces West (-X)
     "Jack_3.5mm_Cui_SJ-3523-SMT_Horizontal": (-1, 0),    # 0 deg faces West (-X)
     "Jack_6.35mm_Neutrik_NMJ4HFD2_Horizontal": (-1, 0),  # 0 deg faces West (-X)
+    "Jack_6.35mm_Neutrik_NMJ6HCD2_Horizontal": (-1, 0),  # 0 deg faces West (-X)
+
+    # Potentiometers (Panel Controls)
+    "Potentiometer_Alps_RK097_Dual_Horizontal": (-1, 0), # 0 deg shaft points West (-X)
 
     # Barrel Jacks & Power
     "BarrelJack_Horizontal": (-1, 0),                    # 0 deg faces West (-X)

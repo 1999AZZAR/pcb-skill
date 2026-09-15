@@ -158,12 +158,12 @@ def _validate_with_pcbnew(board_path: str, min_edge_clearance_mm: float) -> Dict
         # Vertical pin headers plug in along Z (upwards) and do not have an outward edge face.
         is_directional_conn = (
             any(fp_id.startswith(k) for k in CONNECTOR_0DEG_FACES) or
-            any(sub in fp_id for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "SMA", "HDMI", "RJ45"]) or
-            ("Horizontal" in fp_id and ("PinHeader" in fp_id or ref.startswith("J"))) or
-            ("RightAngle" in fp_id and ("PinHeader" in fp_id or ref.startswith("J")))
+            any(sub in fp_id for sub in ["USB_C", "Micro_B", "Jack_3.5", "BarrelJack", "SMA", "HDMI", "RJ45", "Potentiometer"]) or
+            ("Horizontal" in fp_id and ("PinHeader" in fp_id or ref.startswith("J") or ref.startswith("RV"))) or
+            ("RightAngle" in fp_id and ("PinHeader" in fp_id or ref.startswith("J") or ref.startswith("RV")))
         ) and "Vertical" not in fp_id
 
-        is_conn = is_directional_conn or ref.startswith("J") or "PinHeader" in fp_id
+        is_conn = is_directional_conn or ref.startswith("J") or ref.startswith("RV") or "PinHeader" in fp_id
 
         fp_info = {
             "ref": ref,

@@ -352,6 +352,13 @@ def export_jlcpcb(pcb_path, sch_path=None, out_dir=None, make_zip=True, render_3
         print("\nRunning verification checkers on exported package...")
     _verify_package(gerber_dir, verbose=verbose)
 
+    # 8. Clean temporary artifacts & dumps from project directory
+    try:
+        from cleanup_board import clean_temporary_files
+        clean_temporary_files(os.path.dirname(os.path.abspath(pcb_path)), verbose=False)
+    except Exception:
+        pass
+
     return {
         "target_dir": target_dir,
         "gerber_dir": gerber_dir,

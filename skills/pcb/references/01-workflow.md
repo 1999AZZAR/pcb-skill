@@ -225,6 +225,33 @@ Then order — and see `03-jlc-manufacturing.md` for which route honours a coupo
 pre-payment page and stop.** Logins, CAPTCHAs and payment are the user's; prepare everything else so
 their part takes two minutes.
 
+### Uniform Project Deliverables & Final Cleanup (Mandatory)
+
+To prevent bloat and maintain complete directory uniformity across all PCB projects (e.g. `keyboard_555`, `esp32c3_controller`, `stereo_mixer_4ch`), Phase 4 MUST conclude with a cleanup and consolidation pass before handing off to the user:
+
+1. **Purge Intermediate Scaffolding**: Delete all generator/router scripts (`gen_*.py`, `assert_netlist.py`), trial routing boards (`test_*`), raw netlists (`*.net`), and debug dumps (`*.json`, `*.log`, `*missing3Dmodels.txt`).
+2. **Consolidate Documentation into `README.md`**: Do NOT leave temporary `MISSION.md`, `DECISIONS.md`, or `PROGRESS.md` in the project root. Synthesize all architectural decisions, constraints, circuit formulas, BOM table, and verification metrics into a single master `README.md` embedding the 3D top/bottom preview renders.
+3. **Generate Standard Reports**: Run `kicad-cli pcb drc --output <project>-drc.rpt <project>.kicad_pcb` and `kicad-cli sch erc -o <project>-erc.rpt <project>.kicad_sch`.
+4. **Strict Final Directory Structure**:
+   ```
+   <project_name>/
+   ├── jlcpcb_production/
+   │   ├── gerber/
+   │   ├── <project_name>_bom_jlcpcb.csv
+   │   ├── <project_name>_cpl_jlcpcb.csv
+   │   ├── <project_name>_gerber_jlcpcb.zip
+   │   ├── <project_name>_render_bottom.png
+   │   └── <project_name>_render_top.png
+   ├── <project_name>-drc.rpt
+   ├── <project_name>-erc.rpt
+   ├── <project_name>.kicad_pcb
+   ├── <project_name>.kicad_prl
+   ├── <project_name>.kicad_pro
+   ├── <project_name>.kicad_sch
+   ├── README.md
+   └── fp-info-cache
+   ```
+
 ---
 
 ## How to decompose the work
