@@ -36,38 +36,30 @@ WHAT THIS CANNOT SEE
     * Whether the route is good.  Islands, clearance, plane integrity: route_accept.py.
     * Nets that were never in the DSN.  They are not in the SES either, and their
       absence here is invisible.  Tell route_accept.py about them with --expect-open.
-    * Whether the EDA will accept the records it writes.  The `easyeda` writer produces
-      the record dialect of a .epcb; a different EDA needs a different writer and the
-      neutral `json` output is the place to start.
 
 OUTPUT FORMATS
+    --format kicad    merges routed tracks and vias directly into a base KiCad PCB (.kicad_pcb).
     --format json     neutral wiring JSON: {"segments": [...], "vias": [...]} in mm,
                       with layer NAMES as the SES spells them.  Always available.
-    --format easyeda  appends LINE and VIA records to a base .epcb (record dialect),
-                      mapping layer names to ids with --layer-map.
 
 HOW IT WAS VALIDATED
     Ported from the converter of a released board; re-parsing that project's own session
     files reproduces its segment, via and per-width counts.  `--selftest` round-trips a
     synthetic SES covering both quoted and bare net names, the paren-less via line, and
-    the 1/1000 mil scale.
+    the 1/1000 mil scale into a valid KiCad PCB.
 
 USAGE
+    python3 ses_import.py route.ses --format kicad -o board.kicad_pcb --base board.kicad_pcb
+                          [--strip] [--via-pad 0.6] [--via-drill 0.3]
+                          [--protected "MIPI_D0P,MIPI_D0N"] [--keep-nets "GND"]
     python3 ses_import.py route.ses --format json  -o wiring.json
                           [--protected "MIPI_D0P,MIPI_D0N"] [--keep-protected]
                           [--forbid-layers "Inner1"]
-    python3 ses_import.py route.ses --format easyeda -o out.epcb --base in.epcb
-                          --layer-map layers.json [--strip] [--via-pad 0.5]
-                          [--via-drill 0.3] [--keep-nets "GND,AGND"]
     python3 ses_import.py --selftest
-
-    layers.json is {"TopLayer": 1, "Inner1": 15, "Inner2": 16, "BottomLayer": 2} --
-    the EXAMPLE project's map, measured on that board, not a standard.
 """
 from __future__ import print_function
 
 import json
-import random
 import re
 import sys
 
@@ -160,126 +152,6 @@ def filter_wiring(segments, vias, protected=(), keep_protected=False,
             % (len(bad), sorted({s['layer'] for s in bad})))
     return segments, vias
 
-
-# --------------------------------------------------------------- EasyEDA record writer
-
-def _load_records(path):
-    with open(path, encoding="utf-8", newline="") as fh:
-        return fh.read().split("\n")
-
-
-def strip_routing(lines, keep_nets=(), protected=(), verbose=True):
-    """Remove LINE and VIA records, keeping protected copper and named nets' vias.
-
-    WARNING, and it is not a small one: this is only safe when EVERY LINE record in the
-    document is copper.  On the reference board that was checked and true -- there was
-    no silkscreen or outline geometry among them, and every LINE carried a net name.
-    Check yours before trusting --strip.  Records without a parseable body are kept.
-    """
-    keep_nets = set(keep_nets)
-    protected = set(protected)
-    out, dl, dv = [], 0, 0
-    dec = json.JSONDecoder()
-    for ln in lines:
-        st = ln.strip()
-        if not st:
-            out.append(ln)
-            continue
-        h, _sep, b = st.partition("||")
-        try:
-            t = json.loads(h).get("type")
-        except Exception:
-            out.append(ln)
-            continue
-        if t not in ("LINE", "VIA"):
-            out.append(ln)
-            continue
-        try:
-            body, _e = dec.raw_decode(b.rstrip("|"))
-        except Exception:
-            out.append(ln)
-            continue
-        net = body.get("netName")
-        if net in protected:
-            out.append(ln)
-            continue
-        if t == "VIA" and net in keep_nets:
-            out.append(ln)
-            continue
-        if t == "LINE":
-            dl += 1
-        else:
-            dv += 1
-    if verbose:
-        print("stripped previous routing: -%d LINE, -%d VIA "
-              "(kept protected copper and %s vias)"
-              % (dl, dv, "/".join(sorted(keep_nets)) or "no"))
-    return out
-
-
-def write_easyeda(base_path, out_path, segments, vias, layer_map,
-                  via_pad=0.5, via_drill=0.3, strip=False, keep_nets=(),
-                  protected=(), seed=0, verbose=True):
-    lines = _load_records(base_path)
-    if strip:
-        lines = strip_routing(lines, keep_nets=keep_nets, protected=protected,
-                              verbose=verbose)
-    unknown = {s["layer"] for s in segments} - set(layer_map)
-    if unknown:
-        raise SystemExit("SES uses layer(s) %s that --layer-map does not name"
-                         % sorted(unknown))
-    if lines and not lines[-1].endswith("|"):
-        lines[-1] += "|"
-    ticket = 0
-    for ln in lines:
-        if not ln.strip():
-            continue
-        try:
-            ticket = max(ticket, json.loads(ln.partition("||")[0]).get("ticket", 0) or 0)
-        except Exception:
-            pass
-    ticket += 1
-    rng = random.Random(seed)
-    new = []
-
-    def push(t, body):
-        nonlocal_ticket[0] += 1
-        h = {"type": t, "ticket": nonlocal_ticket[0],
-             "id": "%016x" % rng.getrandbits(64)}
-        new.append(json.dumps(h, separators=(",", ":")) + "||"
-                   + json.dumps(body, separators=(",", ":")) + "|")
-
-    nonlocal_ticket = [ticket - 1]
-    for s in segments:
-        push("LINE", {"partitionId": "", "groupId": 0, "netName": s["net"],
-                      "layerId": layer_map[s["layer"]],
-                      "startX": round(s["x1"] * MM2MIL, 4),
-                      "startY": round(s["y1"] * MM2MIL, 4),
-                      "endX": round(s["x2"] * MM2MIL, 4),
-                      "endY": round(s["y2"] * MM2MIL, 4),
-                      "width": round(s["w"] * MM2MIL, 4),
-                      "locked": False, "zIndex": -1})
-    for v in vias:
-        push("VIA", {"partitionId": "", "groupId": 0, "netName": v["net"],
-                     "ruleName": "",
-                     "centerX": round(v["x"] * MM2MIL, 4),
-                     "centerY": round(v["y"] * MM2MIL, 4),
-                     "holeDiameter": round(via_drill * MM2MIL, 4),
-                     "viaDiameter": round(via_pad * MM2MIL, 4),
-                     "viaType": "NORMAL",
-                     "topSolderExpansion": None, "bottomSolderExpansion": None,
-                     "locked": False, "unusedInnerLayers": []})
-    if new:
-        new[-1] = new[-1][:-1]
-    with open(out_path, "w", encoding="utf-8", newline="") as fh:
-        fh.write("\n".join(lines + new))
-    if verbose:
-        hist = {}
-        for s in segments:
-            k = round(s["w"], 3)
-            hist[k] = hist.get(k, 0) + 1
-        print("wrote %s  (+%d LINE, +%d VIA)" % (out_path, len(segments), len(vias)))
-        print("widths laid (mm): %s" % {k: hist[k] for k in sorted(hist)})
 
 
 # --------------------------------------------------------------- KiCad writer
@@ -452,40 +324,26 @@ def _selftest():
     print("  copper on a forbidden plane layer is fatal    : %s" % ("OK" if good else "FAIL"))
     ok &= good
 
-    # easyeda writer round trip
+    # KiCad writer round trip
     import tempfile
     import os
+    import shutil
     tmp = tempfile.mkdtemp(prefix="pcbkit-")
-    base = os.path.join(tmp, "base.epcb")
-    open(base, "w", encoding="utf-8").write(
-        '{"type":"DOCHEAD"}||{"docType":"PCB","uuid":"X"}|\n'
-        '{"type":"LINE","ticket":5,"id":"old1"}||{"netName":"OLD","layerId":1,'
-        '"startX":0,"startY":0,"endX":10,"endY":0,"width":4}|')
-    outp = os.path.join(tmp, "out.epcb")
-    write_easyeda(base, outp, segs2, vias2, {"TopLayer": 1, "BottomLayer": 2},
-                  strip=True, verbose=False)
-    txt = open(outp, encoding="utf-8").read()
-    good = '"netName":"OLD"' not in txt and '"netName":"BARE_NET"' in txt
-    print("  --strip removed old copper, added the new     : %s" % ("OK" if good else "FAIL"))
-    ok &= good
-    good = '"width":3.937' in txt
-    print("  0.10 mm written back as %s mil                : %s"
-          % ("3.937", "OK" if good else "FAIL"))
-    ok &= good
-
-    # KiCad writer round trip
-    kc_base = os.path.join(tmp, "base.kicad_pcb")
-    open(kc_base, "w", encoding="utf-8").write(
-        '(kicad_pcb (version 20241229) (generator "pcbnew") (generator_version "9.0")\n'
-        '  (net 0 "") (net 1 "BARE_NET") (net 2 "OLD")\n'
-        '  (segment (start 0 0) (end 5 0) (width 0.25) (layer "F.Cu") (net 2))\n'
-        ')\n')
-    kc_out = os.path.join(tmp, "out.kicad_pcb")
-    write_kicad(kc_base, kc_out, segs2, vias2, strip=True, verbose=False)
-    kc_txt = open(kc_out, encoding="utf-8").read()
-    good = '(net 2)' not in kc_txt and '(net 1)' in kc_txt and '(via' in kc_txt
-    print("  KiCad writer merged segments & vias into PCB  : %s" % ("OK" if good else "FAIL"))
-    ok &= good
+    try:
+        kc_base = os.path.join(tmp, "base.kicad_pcb")
+        open(kc_base, "w", encoding="utf-8").write(
+            '(kicad_pcb (version 20241229) (generator "pcbnew") (generator_version "9.0")\n'
+            '  (net 0 "") (net 1 "BARE_NET") (net 2 "OLD")\n'
+            '  (segment (start 0 0) (end 5 0) (width 0.25) (layer "F.Cu") (net 2))\n'
+            ')\n')
+        kc_out = os.path.join(tmp, "out.kicad_pcb")
+        write_kicad(kc_base, kc_out, segs2, vias2, strip=True, verbose=False)
+        kc_txt = open(kc_out, encoding="utf-8").read()
+        good = '(net 2)' not in kc_txt and '(net 1)' in kc_txt and '(via' in kc_txt
+        print("  KiCad writer merged segments & vias into PCB  : %s" % ("OK" if good else "FAIL"))
+        ok &= good
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
     print("ses_import selftest: %s" % ("PASS" if ok else "FAIL"))
     return 0 if ok else 1
@@ -515,7 +373,7 @@ def main(argv):
     segs, vias = filter_wiring(segs, vias, protected=protected,
                                keep_protected=("--keep-protected" in argv),
                                forbid_layers=_names(argv, "--forbid-layers"))
-    fmt = opt("--format", "json")
+    fmt = opt("--format", "kicad")
     out = opt("-o") or opt("--out")
     if not out:
         raise SystemExit("-o OUTPUT is required")
@@ -539,20 +397,6 @@ def main(argv):
                     strip=("--strip" in argv),
                     keep_nets=_names(argv, "--keep-nets"),
                     protected=protected)
-        return 0
-    if fmt == "easyeda":
-        base = opt("--base")
-        lm = opt("--layer-map")
-        if not base or not lm:
-            raise SystemExit("--format easyeda needs --base and --layer-map")
-        with open(lm, encoding="utf-8") as fh:
-            layer_map = json.load(fh)
-        write_easyeda(base, out, segs, vias, layer_map,
-                      via_pad=float(opt("--via-pad", 0.5)),
-                      via_drill=float(opt("--via-drill", 0.3)),
-                      strip=("--strip" in argv),
-                      keep_nets=_names(argv, "--keep-nets"),
-                      protected=protected)
         return 0
     raise SystemExit("unknown --format %r" % fmt)
 

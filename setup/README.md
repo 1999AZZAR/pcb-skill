@@ -8,16 +8,14 @@ Each step below has a **proof**. Run it. "It looked fine" is not one of them.
 
 ---
 
-## 1. EasyEDA Pro over MCP → [`easyeda-mcp.md`](easyeda-mcp.md)
+## 1. KiCad Environment → [`kicad-setup.md`](kicad-setup.md)
 
-Build the bridge fork, install its extension inside EasyEDA Pro through the GUI, register the MCP
-server with Claude Code or Codex, and — if the EDA is running half-offline — create the project by
-hand once, because the API cannot.
+Install KiCad (v9 native, v7/v8 supported) with `kicad-cli` and `pcbnew` Python bindings,
+and verify the headless checker tools and scripts.
 
-**How you know it worked:** `server_info` returns `extensionConnected: true` **and** an
-`extensionVersion` equal to the build you just installed, and `editor_get_open_tabs` lists the
-documents you expect. A successful `npm run build` proves nothing: same-version extension imports are
-a silent no-op.
+**How you know it worked:** `kicad-cli --version` outputs the installed version (e.g. `9.0.x`),
+`python3 -c "import pcbnew"` imports cleanly without error, and running
+`python3 scripts/run_all_tests.py` reports `ALL TESTS PASSED ✔️`.
 
 ---
 
@@ -68,7 +66,7 @@ notification channel — you have a hope.
 
 | # | do | proof |
 |---|---|---|
-| 1 | build the bridge, install the `.eext`, register the MCP server, create the project by hand if half-offline | `server_info` → `extensionConnected: true` + the version you built; `editor_get_open_tabs` lists your documents |
+| 1 | install KiCad 9 and pcbnew, test headless toolchain | `kicad-cli --version` output; `python3 scripts/run_all_tests.py` reports all passed |
 | 2 | log in everywhere; grant the domains to the extension | the agent reads your cart back, no redirect, no permission error |
 | 3 | install the approval watcher, if you need one | a recent `APPROVE` line in its log |
 | 4 | wire up notifications | a test message arrives, and the watchdog would emit a line on a crash |

@@ -135,7 +135,7 @@ every component, pin and net) and generates the EDA document from it. Then the s
 regenerable, diffable, and — crucially — a second program can assert against the same data.
 
 **Gate 2 is not DRC.** DRC passed with zero errors on a schematic where the backlight switching node
-was shorted to the TF card rail and the I²S data line was shorted to ground (see `05-easyeda-mcp.md`).
+was shorted to the TF card rail and the I²S data line was shorted to ground (see `05-kicad-workflow.md`).
 The gate is **assertions against the EDA's own exported netlist**:
 
 | assertion class | count in the reference project |

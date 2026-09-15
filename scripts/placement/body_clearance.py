@@ -17,8 +17,8 @@ WHAT THIS CANNOT SEE
       while its moulded body reached x 41.400, a 3.05 mm overhang in which three passives
       were legally placed.  The gate that sees THAT is verify/mesh3d.py, working on the
       real 3D export.  Run both.
-    * Concave bodies.  The EasyEDA adapter reduces a multi-primitive assembly outline to
-      its bounding box (see import_easyeda._ring).  For containment that is conservative
+    * Concave bodies.  Multi-primitive assembly outlines may be reduced to
+      bounding boxes.  For containment that is conservative
       -- it can report a false overlap, never a false clearance -- but an L-shaped part
       will report gaps that are pessimistic.
     * Intentional stacking.  A part legitimately mounted on top of another (a shield, a

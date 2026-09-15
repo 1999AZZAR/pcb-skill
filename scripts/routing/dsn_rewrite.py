@@ -8,7 +8,7 @@ WHAT THIS DOES
     trusted.  Four edits, each one paid for on a real board:
 
     1. SOLID INNER PLANES BECOME `(type power)`.
-       EasyEDA exports a solid GND plane as `(type signal)`.  A router given that will
+       Certain exporters output a solid GND plane as `(type signal)`.  A router given that will
        cut the reference plane to pieces, and every impedance-controlled pair on the
        board loses its reference.  `(type power)` layers are not routed on.
        If the assertion that the layer block was found fails, STOP -- the export format
@@ -20,7 +20,7 @@ WHAT THIS DOES
        per class, or dropping the default silently halves them.
 
     3. CLASS MEMBERS ARE EMITTED BARE.
-       This is the expensive one.  EasyEDA writes `(class X 'X' ...)` -- the net name
+       This is the expensive one.  Some tools write `(class X 'X' ...)` -- the net name
        SINGLE-QUOTED.  FreeRouting then binds the class to nothing, and every net comes
        back at the structure default width.  A 40-minute run was lost to this before it
        was noticed, with a nominally-90-ohm USB pair routed at ~120 ohm.  The rewritten

@@ -21,7 +21,7 @@ WHY IT IS NOT ENOUGH TO ASK THE EDA
     ELEMENT id, not by the pad NUMBER.  They coincide for most parts and do NOT for a
     connector whose several shell legs all carry pad number "1" -- keying by number put
     a ground net on the wrong pin, and nothing complained.  The board JSON produced by
-    placement/import_easyeda.py carries BOTH keys ("DES.NUM" and "DES#ELEM") so this
+    placement/import_kicad.py carries BOTH keys ("DES.NUM" and "DES#ELEM") so this
     script can report where they disagree.
 
 WHAT THIS CANNOT SEE

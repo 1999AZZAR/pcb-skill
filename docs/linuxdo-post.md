@@ -73,9 +73,9 @@ https://github.com/daishuge/pcb-skill
 
 https://github.com/daishuge/pcb-skill （MIT）
 
-- `skills/pcb/` —— skill 本体 + 七篇按需加载的参考：工作流与关卡、对抗评审协议、嘉立创制造和免费券条款（带原文引用）、选料与比价、EasyEDA MCP 的 33 个坑、机械/3D 验证、烧录与上电
+- `skills/pcb/` —— skill 本体 + 七篇按需加载的参考：工作流与关卡、对抗评审协议、嘉立创制造和免费券条款（带原文引用）、选料与比价、KiCad 自动化与工作流指南、机械/3D 验证、烧录与上电
 - `scripts/` —— 21 个检查器。它们**解析导出文件和 Gerber，不问 EDA**，所以能反驳生成它的工具。上面那四个静默失效全部修好了，其中三个带 selftest 复现当年的错答案
-- `setup/` —— EasyEDA MCP 接入、浏览器登录、Windows/macOS 的审批弹窗看门狗
+- `setup/` —— KiCad 环境配置、浏览器登录、Windows/macOS 的审批弹窗看门狗
 - `docs/case-study.md` —— 这块板的完整复盘
 
 有一条我写死在 skill 里：**agent 永远不下单、不付款**，只把订单推到付款前那一页，最后一下是人按。

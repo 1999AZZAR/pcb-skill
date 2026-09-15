@@ -16,7 +16,6 @@ Everything is millimetres. Angles are degrees, counter-clockwise.
 | `geom2d.py` | shared exact 2D geometry: polygon distance **with containment**, obrounds, capsules, round-rects | stdlib |
 | `boardmodel.py` | the neutral **board JSON** every checker reads; derives placed pads, bodies and courtyards | stdlib |
 | `import_kicad.py` | adapter: KiCad (`.kicad_pcb`) → board JSON (pcbnew / S-expr fallback) | pcbnew / stdlib |
-| `import_easyeda.py` | adapter: an EasyEDA Pro export → board JSON (both on-disk dialects) | stdlib |
 | `courtyard_check.py` | courtyard separation, pad/drill to outline, **net-blind hole-to-hole** | stdlib |
 | `body_clearance.py` | every part against **every** other part's body — no size filter | stdlib |
 | `channels.py` | free-span and via-lane statistics against **this board's** rules | stdlib |
@@ -29,9 +28,8 @@ keep `scripts/` together.
 ## Quick start
 
 ```sh
-# 1. turn a KiCad board (or EasyEDA export) into board JSON
+# 1. turn a KiCad board into board JSON
 python3 import_kicad.py board.json project.kicad_pcb [--schematic project.kicad_sch]
-# or: python3 import_easyeda.py board.json path/to/export/PCB path/to/export/FOOTPRINT
 
 # 2. the three gates
 python3 courtyard_check.py board.json --top 10
@@ -39,26 +37,16 @@ python3 body_clearance.py  board.json --near 3.0 --top 20
 python3 channels.py        board.json --track-width 0.10
 
 # everything self-tests on synthetic input, no board needed
-for f in geom2d boardmodel import_kicad import_easyeda courtyard_check body_clearance channels; do
+for f in geom2d boardmodel import_kicad courtyard_check body_clearance channels; do
   python3 $f.py --selftest
 done
 ```
-
-`import_easyeda.py` accepts files or directories and auto-detects the dialect:
-
-* **record** — `{"type":"PAD",…}||{…}|` lines, what `document_save_to_file` writes;
-* **array** — `["PAD",id,…]` NDJSON, what a project export writes inside its archive.
-
-Mixed inputs are fine (a live PCB document plus a footprint library from elsewhere).
-Components referencing a footprint that is not in the export are **warned about and
-skipped**, never silently placed.
 
 ---
 
 ## The board JSON
 
-One EDA-independent document. Porting the toolkit to another EDA means writing a
-sibling of `import_easyeda.py` and nothing else.
+One EDA-independent document, generated directly from KiCad by `import_kicad.py`.
 
 ```jsonc
 {

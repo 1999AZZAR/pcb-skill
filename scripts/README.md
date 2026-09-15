@@ -31,7 +31,6 @@ together: `routing/` and `verify/` import the geometry core and board model from
 
 ```
    KiCad .kicad_pcb ──► placement/import_kicad.py ──► board.json ─┐
-   (or EasyEDA)     ──► placement/import_easyeda.py               │
                                                                   │
    board.json ──► placement/courtyard_check.py                    │  courtyards, pad/drill
               ──► placement/body_clearance.py                     │  to outline, hole to
@@ -60,10 +59,9 @@ model; parse the 3D export you just made, not a cached one.
 
 ## The board JSON
 
-One EDA-independent document that every checker reads. Porting the toolkit to another
-EDA means writing a sibling of `placement/import_easyeda.py` and nothing else. The schema
-is in `placement/README.md`; `placement/boardmodel.py --selftest` builds a valid one in
-memory if you want to see the shape.
+One EDA-independent document that every checker reads. The neutral board model is generated
+directly from KiCad by `placement/import_kicad.py`. The schema is in `placement/README.md`;
+`placement/boardmodel.py --selftest` builds a valid one in memory if you want to see the shape.
 
 ---
 

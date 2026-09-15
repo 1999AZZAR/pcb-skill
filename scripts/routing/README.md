@@ -16,11 +16,11 @@ read, not easier.
 |---|---|
 | `dsn_rewrite.py` | patch an EDA-exported `.dsn`: solid planes → `(type power)`, per-net widths, **bare class members**, optional board-edge keepout |
 | `dsn_slim.py` | keep only the protected wiring worth protecting; drop nets the router must not be given |
-| `ses_import.py` | parse a `.ses` and write neutral wiring JSON, or append records to a `.epcb` |
+| `ses_import.py` | parse a `.ses` and merge routed tracks/vias into KiCad (`.kicad_pcb`) or neutral wiring JSON |
 | `route_accept.py` | acceptance on the read-back board; progress metric is **islands merged** |
 | `route_supervise.py` | four-state watchdog + connections-per-minute floor |
 
-`route_accept.py` reads the board JSON produced by `../placement/import_easyeda.py` and
+`route_accept.py` reads the board JSON produced by `../placement/import_kicad.py` and
 imports `geom2d`/`boardmodel` from `../placement`, so keep `scripts/` together.
 
 ---
@@ -43,14 +43,14 @@ python3 dsn_slim.py tuned.dsn slim.dsn \
 python3 route_supervise.py --log route.log --output route.ses --pid $ROUTER_PID \
         --poll 30 --max-seconds 50400 --min-rate 0.10
 
-# 4. convert the session file
-python3 ses_import.py route.ses --format easyeda -o merged.epcb \
-        --base current.epcb --layer-map layers.json --strip \
+# 4. convert and merge the session file directly into KiCad
+python3 ses_import.py route.ses --format kicad -o project.kicad_pcb \
+        --base project.kicad_pcb --strip \
         --protected "NET_A_P,NET_A_N" --keep-nets "GND" \
         --forbid-layers "Inner1"
 
-# 5. push it, then PULL IT BACK and judge the read-back, never the pushed file
-python3 ../placement/import_easyeda.py after.json readback.epcb footprints/
+# 5. regenerate board model and judge the result on the real PCB
+python3 ../placement/import_kicad.py after.json project.kicad_pcb
 python3 route_accept.py after.json --baseline before.json \
         --protected "NET_A_P,NET_A_N" --plane-nets "GND" --expect-open "VBUS"
 ```
