@@ -53,7 +53,7 @@ This automatically produces:
 ## 2. Complete Automation Controller: `kicad_ctl.py`
 
 For deep programmatic control over schematics, placement, routing, and libraries, the skill provides
-[`scripts/kicad/kicad_ctl.py`](file:///home/azzar/.agents/skills/pcb/scripts/kicad/kicad_ctl.py), exposing **233 automation commands** directly:
+[`scripts/kicad/kicad_ctl.py`](../../scripts/kicad/kicad_ctl.py), exposing **233 automation commands** directly:
 
 ### Command Categories
 ```bash
@@ -121,7 +121,7 @@ To guarantee 100% DRC clean, high-signal-integrity, production-ready boards:
 
 ## 4. Deterministic 2-Layer Layout Engine: `autoroute_2layer.py`
 
-[`scripts/kicad/autoroute_2layer.py`](file:///home/azzar/.agents/skills/pcb/scripts/kicad/autoroute_2layer.py) provides a high-level, fluent Python builder implementing all 5 Golden Rules:
+[`scripts/kicad/autoroute_2layer.py`](../../scripts/kicad/autoroute_2layer.py) provides a high-level, fluent Python builder implementing all 5 Golden Rules:
 
 ```python
 from autoroute_2layer import PCB2LayerBuilder

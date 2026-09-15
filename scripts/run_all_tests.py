@@ -188,11 +188,17 @@ def test_embed_symbols_selftest():
 
 
 def _find_project_dir(name):
-    for base in ("/home/azzar/project/pcb", "/home/azzar/project"):
-        cand = os.path.join(base, name)
+    candidates = [
+        os.path.join(_SKILL_ROOT, "project", "pcb", name),
+        os.path.join(_SKILL_ROOT, "project", name),
+        os.path.expanduser(f"~/project/pcb/{name}"),
+        os.path.expanduser(f"~/project/{name}"),
+        os.path.join("/home/azzar/project/pcb", name),
+    ]
+    for cand in candidates:
         if os.path.isdir(cand):
             return cand
-    return os.path.join("/home/azzar/project/pcb", name)
+    return candidates[0]
 
 
 def test_wire_schematic_selftest():

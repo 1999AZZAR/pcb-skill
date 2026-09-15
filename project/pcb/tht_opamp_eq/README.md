@@ -126,7 +126,7 @@ To ensure easy physical access for your soldering iron tip, solder components in
 
 The design is 100% compliant with standard prototype manufacturing specs (JLCPCB, PCBWay, OSH Park):
 
-- **Production Package**: Upload [`jlcpcb_production/tht_opamp_eq_gerber_jlcpcb.zip`](file:///home/azzar/project/tht_opamp_eq/jlcpcb_production/tht_opamp_eq_gerber_jlcpcb.zip) directly to the manufacturer's order page.
+- **Production Package**: Upload [`jlcpcb_production/tht_opamp_eq_gerber_jlcpcb.zip`](./jlcpcb_production/tht_opamp_eq_gerber_jlcpcb.zip) directly to the manufacturer's order page.
 - **Recommended Options**:
   - **Dimensions**: 88.0 mm × 61.0 mm (detected automatically from zip)
   - **Layers**: 2 Layers
@@ -142,7 +142,7 @@ The design is 100% compliant with standard prototype manufacturing specs (JLCPCB
 ## Project Structure
 
 ```text
-/home/azzar/project/tht_opamp_eq/
+tht_opamp_eq/
 ├── README.md                      # Complete documentation & specifications
 ├── tht_opamp_eq.kicad_pcb         # Master production PCB file (KiCad 9)
 ├── tht_opamp_eq.kicad_sch         # Schematic source file (KiCad 9)
